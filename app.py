@@ -9,7 +9,6 @@ from dash.dependencies import Input, Output, State
 
 ########### Define your variables ######
 myheading1='Predicting Mortgage Loan Approval - Pat Gelvin'
-# image1='ames_welcome.jpeg'
 tabtitle = 'Mortgage Loans - Pat Gelvin'
 sourceurl = 'https://www.kaggle.com/burak3ergun/loan-data-set'
 githublink = 'https://github.com/pgelvin/504-mortgage-loans-predictor.git'
@@ -233,7 +232,7 @@ app.layout = html.Div(children=[
                 html.H3('Predictions'),
                 html.Button(children='Submit', id='submit-val', n_clicks=0,
                                 style={
-                                'background-color': 'red',
+                                'background-color': 'purple',
                                 'color': 'white',
                                 'margin-left': '5px',
                                 'verticalAlign': 'center',
@@ -279,8 +278,8 @@ app.layout = html.Div(children=[
      Input(component_id='submit-val', component_property='n_clicks'),
     )
 def func(*args):
-    listofargs=[arg for arg in args[:9]]
-    return make_predictions(listofargs, args[9])
+    listofargs=[arg for arg in args[:8]]
+    return make_predictions(listofargs, args[8])
 
 
 ######### Define Callback: Visualization
