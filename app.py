@@ -8,14 +8,14 @@ from dash.dependencies import Input, Output, State
 
 
 ########### Define your variables ######
-myheading1='Predicting Mortgage Loan Approval'
+myheading1='Predicting Mortgage Loan Approval - Pat Gelvin'
 image1='ames_welcome.jpeg'
-tabtitle = 'Mortgage Loans'
+tabtitle = 'Pat Gelvin Mortgage Loans'
 sourceurl = 'https://www.kaggle.com/burak3ergun/loan-data-set'
-githublink = 'https://github.com/plotly-dash-apps/504-mortgage-loans-predictor'
+githublink = 'https://github.com/pgelvin/504-mortgage-loans-predictor.git'
 
 
-########### Model featurse
+########### Model features
 features = ['Credit_History',
 'LoanAmount',
 'Loan_Amount_Term',
@@ -24,7 +24,7 @@ features = ['Credit_History',
  'Property_Area',
  'Gender',
  'Education',
-  'Self_Employed'
+ 'Self_Employed'
  ]
 
 
@@ -32,9 +32,9 @@ features = ['Credit_History',
 # dataframes for visualization
 approved=pd.read_csv('model_components/approved_loans.csv')
 denied=pd.read_csv('model_components/denied_loans.csv')
-# logistic regression model
+# lr model
 filename = open('model_components/loan_approval_lr_model.pkl', 'rb')
-lf = pickle.load(filename)
+lr = pickle.load(filename)
 filename.close()
 # encoder1
 filename = open('model_components/loan_approval_onehot_encoder.pkl', 'rb')
@@ -88,11 +88,11 @@ def make_predictions(listofargs, Threshold):
         df['ln_LoanAmount'] = ss_scaler3.transform(np.array(ln_LoanAmount_raw).reshape(-1, 1))
 
         # drop & rearrange the columns in the order expected by your trained model!
-        df=df[['Gender', 'Education', 'Self_Employed', 'Credit_History',
+        df=df[['Gender','Education', 'Self_Employed', 'Credit_History',
            'Property_Area_Semiurban', 'Property_Area_Urban', 'Property_Area_Rural', 'ln_monthly_return',
            'ln_total_income', 'ln_LoanAmount']]
 
-        prob = lf.predict_proba(df)
+        prob = lr.predict_proba(df)
         raw_approval_prob=prob[0][1]
         Threshold=Threshold*.01
         approval_func = lambda y: 'Approved' if raw_approval_prob>Threshold else 'Denied'
@@ -101,8 +101,6 @@ def make_predictions(listofargs, Threshold):
         return approval_func(raw_approval_prob), formatted_approval_prob, formatted_denial_prob        # return list(df.columns), list(df.columns), str(df.head().values)
     except:
         return 'Invalid inputs','Invalid inputs','Invalid inputs'
-
-
 
 
 ## FUNCTION FOR VISUALIZATION
@@ -120,7 +118,6 @@ def make_loans_cube(*args):
             ["Credit: {}".format(x) for x in approved['Credit_History']],
             ["<br>Education: {}".format(x) for x in approved['Education']],
             ["<br>Property Area: {}".format(x) for x in approved['Property_Area']],
-            ["<br>Gender: {}".format(x) for x in approved['Gender']],
             ["<br>Education: {}".format(x) for x in approved['Education']],
             ["<br>Self-Employed: {}".format(x) for x in approved['Self_Employed']]
                 )) ,
@@ -188,9 +185,6 @@ def make_loans_cube(*args):
     return fig
 
 
-
-
-
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -241,7 +235,7 @@ app.layout = html.Div(children=[
                 html.H3('Predictions'),
                 html.Button(children='Submit', id='submit-val', n_clicks=0,
                                 style={
-                                'background-color': 'red',
+                                'background-color': 'purple',
                                 'color': 'white',
                                 'margin-left': '5px',
                                 'verticalAlign': 'center',
@@ -287,8 +281,8 @@ app.layout = html.Div(children=[
      Input(component_id='submit-val', component_property='n_clicks'),
     )
 def func(*args):
-    listofargs=[arg for arg in args[:9]]
-    return make_predictions(listofargs, args[9])
+    listofargs=[arg for arg in args[:8]]
+    return make_predictions(listofargs, args[8])
 
 
 ######### Define Callback: Visualization
