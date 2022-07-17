@@ -24,7 +24,7 @@ features = ['Credit_History',
  'Property_Area',
  'Gender',
  'Education',
- 'Self_Employed'
+  'Self_Employed'
  ]
 
 
@@ -32,7 +32,7 @@ features = ['Credit_History',
 # dataframes for visualization
 approved=pd.read_csv('model_components/approved_loans.csv')
 denied=pd.read_csv('model_components/denied_loans.csv')
-# lr model
+# random forest model
 filename = open('model_components/loan_approval_rf_model.pkl', 'rb')
 rf = pickle.load(filename)
 filename.close()
@@ -88,7 +88,7 @@ def make_predictions(listofargs, Threshold):
         df['ln_LoanAmount'] = ss_scaler3.transform(np.array(ln_LoanAmount_raw).reshape(-1, 1))
 
         # drop & rearrange the columns in the order expected by your trained model!
-        df=df[['Gender','Education', 'Self_Employed', 'Credit_History',
+        df=df[['Gender', 'Education', 'Self_Employed', 'Credit_History',
            'Property_Area_Semiurban', 'Property_Area_Urban', 'Property_Area_Rural', 'ln_monthly_return',
            'ln_total_income', 'ln_LoanAmount']]
 
@@ -103,6 +103,8 @@ def make_predictions(listofargs, Threshold):
         return 'Invalid inputs','Invalid inputs','Invalid inputs'
 
 
+    
+    
 ## FUNCTION FOR VISUALIZATION
 def make_loans_cube(*args):
     newdata=pd.DataFrame([args[:9]], columns=features)
@@ -118,6 +120,7 @@ def make_loans_cube(*args):
             ["Credit: {}".format(x) for x in approved['Credit_History']],
             ["<br>Education: {}".format(x) for x in approved['Education']],
             ["<br>Property Area: {}".format(x) for x in approved['Property_Area']],
+            ["<br>Gender: {}".format(x) for x in approved['Gender']],
             ["<br>Education: {}".format(x) for x in approved['Education']],
             ["<br>Self-Employed: {}".format(x) for x in approved['Self_Employed']]
                 )) ,
@@ -127,7 +130,7 @@ def make_loans_cube(*args):
             '<br><b>Term: %{z:.0f}</b>'+
             '<br>%{text}',
         hoverinfo='text',
-        marker=dict(size=6, color='blue', opacity=0.4))
+        marker=dict(size=6, color='green', opacity=0.4))
 
     trace1=go.Scatter3d(
         x=denied['LoanAmount'],
@@ -183,6 +186,9 @@ def make_loans_cube(*args):
                     ))
     fig=go.Figure([trace0, trace1, trace2], layout)
     return fig
+
+
+
 
 
 ########### Initiate the app
