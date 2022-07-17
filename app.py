@@ -214,9 +214,9 @@ app.layout = html.Div(children=[
                 html.Div('Term (months)'),
                 dcc.Input(id='Loan_Amount_Term', value=360, type='number', min=120, max=480, step=50),
                 html.Div('Applicant Monthly Income'),
-                dcc.Input(id='ApplicantIncome', value=5500, type='number', min=100, max=6000, step=100),
+                dcc.Input(id='ApplicantIncome', value=5500, type='number', min=100, max=10000, step=100),
                 html.Div('Co-Applicant Monthly Income'),
-                dcc.Input(id='CoapplicantIncome', value=2500, type='number', min=0, max=6000, step=100),
+                dcc.Input(id='CoapplicantIncome', value=2500, type='number', min=0, max=10000, step=100),
                 html.Div('Property Area'),
                 dcc.Dropdown(id='Property_Area',
                     options=[{'label': i, 'value': i} for i in ['Semiurban','Urban','Rural']],
@@ -287,8 +287,8 @@ app.layout = html.Div(children=[
      Input(component_id='submit-val', component_property='n_clicks'),
     )
 def func(*args):
-    listofargs=[arg for arg in args[:8]]
-    return make_predictions(listofargs, args[8])
+    listofargs=[arg for arg in args[:9]]
+    return make_predictions(listofargs, args[9])
 
 
 ######### Define Callback: Visualization
