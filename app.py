@@ -9,21 +9,22 @@ from dash.dependencies import Input, Output, State
 
 ########### Define your variables ######
 myheading1='Predicting Mortgage Loan Approval - Pat Gelvin'
-tabtitle = 'Mortgage Loans - Pat Gelvin'
+image1='ames_welcome.jpeg'
+tabtitle = 'Pat Gelvin Mortgage Loans'
 sourceurl = 'https://www.kaggle.com/burak3ergun/loan-data-set'
 githublink = 'https://github.com/pgelvin/504-mortgage-loans-predictor.git'
 
 
-########### Model featurse
+########### Model features
 features = ['Credit_History',
 'LoanAmount',
 'Loan_Amount_Term',
 'ApplicantIncome',
 'CoapplicantIncome',
  'Property_Area',
-# 'Gender',
+ 'Gender',
  'Education',
-  'Self_Employed'
+ 'Self_Employed'
  ]
 
 
@@ -31,9 +32,9 @@ features = ['Credit_History',
 # dataframes for visualization
 approved=pd.read_csv('model_components/approved_loans.csv')
 denied=pd.read_csv('model_components/denied_loans.csv')
-# random forest model
-filename = open('model_components/loan_approval_rf_model.pkl', 'rb')
-rf = pickle.load(filename)
+# boost model
+filename = open('model_components/loan_approval_boost_model.pkl', 'rb')
+boost = pickle.load(filename)
 filename.close()
 # encoder1
 filename = open('model_components/loan_approval_onehot_encoder.pkl', 'rb')
@@ -67,7 +68,7 @@ def make_predictions(listofargs, Threshold):
             df[var]=int(df[var])
 
         # recode a few columns using the same steps we employed on the training data
-        # df['Gender'].replace({'Male': 1, 'Female': 0}, inplace = True)
+        df['Gender'].replace({'Male': 1, 'Female': 0}, inplace = True)
         df['Education'].replace({'Graduate': 1, 'Not Graduate': 0}, inplace = True)
         df['Self_Employed'].replace({'Yes': 1, 'No': 0}, inplace = True)
         df['LoanAmount'] = df['LoanAmount']*1000
@@ -87,11 +88,11 @@ def make_predictions(listofargs, Threshold):
         df['ln_LoanAmount'] = ss_scaler3.transform(np.array(ln_LoanAmount_raw).reshape(-1, 1))
 
         # drop & rearrange the columns in the order expected by your trained model!
-        df=df[['Education', 'Self_Employed', 'Credit_History',
+        df=df[['Gender','Education', 'Self_Employed', 'Credit_History',
            'Property_Area_Semiurban', 'Property_Area_Urban', 'Property_Area_Rural', 'ln_monthly_return',
            'ln_total_income', 'ln_LoanAmount']]
 
-        prob = rf.predict_proba(df)
+        prob = boost.predict_proba(df)
         raw_approval_prob=prob[0][1]
         Threshold=Threshold*.01
         approval_func = lambda y: 'Approved' if raw_approval_prob>Threshold else 'Denied'
@@ -138,6 +139,7 @@ def make_loans_cube(*args):
             ["Credit: {}".format(x) for x in denied['Credit_History']],
             ["<br>Education: {}".format(x) for x in denied['Education']],
             ["<br>Property Area: {}".format(x) for x in denied['Property_Area']],
+            ["<br>Gender: {}".format(x) for x in denied['Gender']],
             ["<br>Education: {}".format(x) for x in denied['Education']],
             ["<br>Self-Employed: {}".format(x) for x in denied['Self_Employed']]
                 )) ,
@@ -159,6 +161,7 @@ def make_loans_cube(*args):
             ["Credit: {} ".format(x) for x in newdata['Credit_History']],
             ["<br>Education: {} ".format(x) for x in newdata['Education']],
             ["<br>Property Area: {}".format(x) for x in newdata['Property_Area']],
+            ["<br>Gender: {}".format(x) for x in newdata['Gender']],
             ["<br>Education: {}".format(x) for x in newdata['Education']],
             ["<br>Self-Employed: {}".format(x) for x in newdata['Self_Employed']]
                 )) ,
@@ -212,10 +215,10 @@ app.layout = html.Div(children=[
                 dcc.Dropdown(id='Property_Area',
                     options=[{'label': i, 'value': i} for i in ['Semiurban','Urban','Rural']],
                     value='Urban'),
-                #html.Div('Gender'),
-                #dcc.Dropdown(id='Gender',
-                #    options=[{'label': i, 'value': i} for i in ['Male', 'Female']],
-                #    value='Female'),
+                html.Div('Gender'),
+                dcc.Dropdown(id='Gender',
+                    options=[{'label': i, 'value': i} for i in ['Male', 'Female']],
+                    value='Female'),
                 html.Div('Education'),
                 dcc.Dropdown(id='Education',
                     options=[{'label': i, 'value': i} for i in ['Graduate', 'Not Graduate']],
@@ -270,7 +273,7 @@ app.layout = html.Div(children=[
      State(component_id='ApplicantIncome', component_property='value'),
      State(component_id='CoapplicantIncome', component_property='value'),
      State(component_id='Property_Area', component_property='value'),
-     # State(component_id='Gender', component_property='value'),
+     State(component_id='Gender', component_property='value'),
      State(component_id='Education', component_property='value'),
      State(component_id='Self_Employed', component_property='value'),
      State(component_id='Threshold', component_property='value'),
@@ -293,7 +296,7 @@ def func(*args):
             State(component_id='ApplicantIncome', component_property='value'),
             State(component_id='CoapplicantIncome', component_property='value'),
             State(component_id='Property_Area', component_property='value'),
-            # State(component_id='Gender', component_property='value'),
+            State(component_id='Gender', component_property='value'),
             State(component_id='Education', component_property='value'),
             State(component_id='Self_Employed', component_property='value'),
 
