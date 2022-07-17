@@ -32,9 +32,9 @@ features = ['Credit_History',
 # dataframes for visualization
 approved=pd.read_csv('model_components/approved_loans.csv')
 denied=pd.read_csv('model_components/denied_loans.csv')
-# random forest model
-filename = open('model_components/loan_approval_rf_model.pkl', 'rb')
-rf = pickle.load(filename)
+# logistic regression model
+filename = open('model_components/loan_approval_lr_model.pkl', 'rb')
+lf = pickle.load(filename)
 filename.close()
 # encoder1
 filename = open('model_components/loan_approval_onehot_encoder.pkl', 'rb')
@@ -92,7 +92,7 @@ def make_predictions(listofargs, Threshold):
            'Property_Area_Semiurban', 'Property_Area_Urban', 'Property_Area_Rural', 'ln_monthly_return',
            'ln_total_income', 'ln_LoanAmount']]
 
-        prob = rf.predict_proba(df)
+        prob = lf.predict_proba(df)
         raw_approval_prob=prob[0][1]
         Threshold=Threshold*.01
         approval_func = lambda y: 'Approved' if raw_approval_prob>Threshold else 'Denied'
